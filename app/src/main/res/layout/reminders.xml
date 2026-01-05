@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/wall4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <Button
+            android:id="@+id/startBtn2"
+            android:layout_width="113dp"
+            android:layout_height="56dp"
+            android:backgroundTint="#0C1348"
+
+            android:text="Start"
+            android:textColorLink="#832525"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.11"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.252" />
+
+        <Button
+            android:id="@+id/startBtn8"
+            android:layout_width="113dp"
+            android:layout_height="56dp"
+            android:backgroundTint="#0C1348"
+
+            android:text="Start"
+            android:textColorLink="#832525"
+            tools:layout_editor_absoluteX="31dp"
+            tools:layout_editor_absoluteY="202dp" />
+
+        <Button
+            android:id="@+id/startBtn4"
+            android:layout_width="111dp"
+            android:layout_height="58dp"
+            android:backgroundTint="#0C1348"
+
+            android:text="Start"
+            android:textColorLink="#832525"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.109"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.34" />
+
+        <Button
+            android:id="@+id/startBtn6"
+            android:layout_width="111dp"
+            android:layout_height="58dp"
+            android:backgroundTint="#0C1348"
+
+            android:text="Start"
+            android:textColorLink="#832525"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.109"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.423" />
+
+        <Button
+            android:id="@+id/startBtn5"
+            android:layout_width="111dp"
+            android:layout_height="58dp"
+            android:backgroundTint="#0C1348"
+
+            android:text="Start"
+            android:textColorLink="#832525"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.109"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.509" />
+
+        <Button
+            android:id="@+id/startBtn10"
+            android:layout_width="111dp"
+            android:layout_height="58dp"
+            android:backgroundTint="#0C1348"
+
+            android:text="Start"
+            android:textColorLink="#832525"
+            tools:layout_editor_absoluteX="31dp"
+            tools:layout_editor_absoluteY="270dp" />
+
+        <Button
+            android:id="@+id/startBtn11"
+            android:layout_width="111dp"
+            android:layout_height="58dp"
+            android:backgroundTint="#0C1348"
+
+            android:text="Start"
+            android:textColorLink="#832525"
+            tools:layout_editor_absoluteX="31dp"
+            tools:layout_editor_absoluteY="337dp" />
+
+        <Button
+            android:id="@+id/startBtn12"
+            android:layout_width="111dp"
+            android:layout_height="58dp"
+
+            android:backgroundTint="#0C1348"
+            android:text="Start"
+            android:textColorLink="#832525"
+            android:textSize="20sp"
+            tools:layout_editor_absoluteX="31dp"
+            tools:layout_editor_absoluteY="537dp" />
+
+        <Button
+            android:id="@+id/startBtn9"
+            android:layout_width="111dp"
+            android:layout_height="58dp"
+            android:backgroundTint="#0C1348"
+
+            android:text="Start"
+            android:textColorLink="#832525"
+            tools:layout_editor_absoluteX="33dp"
+            tools:layout_editor_absoluteY="471dp" />
+
+        <Button
+            android:id="@+id/startBtn3"
+            android:layout_width="111dp"
+            android:layout_height="58dp"
+            android:backgroundTint="#0C1348"
+
+            android:text="Start"
+            android:textColorLink="#832525"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.117"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.592" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="273dp"
+            android:layout_height="80dp"
+            android:text="REMINDERS!"
+            android:textColor="#010914"
+            android:textSize="40sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.275"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.089" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="229dp"
+            android:layout_height="63dp"
+            android:text="Don't forget your tasks!!!"
+            android:textColor="#010914"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.964" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
