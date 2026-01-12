@@ -51,6 +51,10 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.ViewHolder> {
         RowItem row = rows.get(position);
         List<ListItem> lists = row.lists;
 
+        if (lists == null) {
+            lists = new java.util.ArrayList<>();
+        }
+
         if (sortMode == SortMode.ALPHABETICAL) {
             ListSorter.sortListsAlphabetical(lists);
         } else if (sortMode == SortMode.RECENT) {
@@ -61,13 +65,16 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.ViewHolder> {
             ListSorter.sortListsByStyle(lists);
         }
 
-        holder.rvHorizontalLists.setLayoutManager(
-                new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-        );
+        LinearLayoutManager lm =
+                new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false);
+        holder.rvHorizontalLists.setLayoutManager(lm);
         holder.rvHorizontalLists.setNestedScrollingEnabled(false);
-        holder.rvHorizontalLists.setAdapter(
-                new ListAdapter(context, lists, allCategories)
-        );
+        holder.rvHorizontalLists.setHasFixedSize(false);
+        holder.rvHorizontalLists.setFocusable(false);
+        holder.rvHorizontalLists.setFocusableInTouchMode(false);
+
+        ListAdapter listAdapter = new ListAdapter(context, lists, allCategories);
+        holder.rvHorizontalLists.setAdapter(listAdapter);
     }
 
     @Override

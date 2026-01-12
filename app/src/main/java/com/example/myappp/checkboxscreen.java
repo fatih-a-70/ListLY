@@ -1,9 +1,6 @@
 package com.example.myappp;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,19 +10,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class checkboxscreen extends AppCompatActivity {
 
-    private List<TaskItem> tasks;
-    private TaskAdapter adapter;
-    private String PREF_KEY;
-    private ListStyle style;
-    private FirebaseFirestore db;
-    private String listId;
+    RecyclerView recyclerView;
+    TaskAdapter adapter;
+    List<TaskItem> tasks;
+    ListStyle style;
+    String PREFKEY;
+    String listId;
+    FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,30 +28,31 @@ public class checkboxscreen extends AppCompatActivity {
 
         String styleStr = getIntent().getStringExtra("STYLE");
         style = styleStr != null ? ListStyle.valueOf(styleStr) : ListStyle.CHECKBOX;
-
         int theme = getIntent().getIntExtra("THEME", R.drawable.p5);
 
         setContentView(getLayoutByStyle(style));
 
-        RecyclerView rv = findViewById(R.id.recycler);
-        rv.setBackgroundResource(theme);
+        recyclerView = findViewById(R.id.recycler);
+        recyclerView.setBackgroundResource(theme);
 
         db = FirebaseFirestore.getInstance();
-
-        PREF_KEY = getIntent().getStringExtra("PREF_KEY");
+        PREFKEY = getIntent().getStringExtra("PREFKEY");
         listId = getIntent().getStringExtra("LIST_ID");
-        setTitle(getIntent().getStringExtra("TITLE"));
 
-        rv.setLayoutManager(new LinearLayoutManager(this));
+        String title = getIntent().getStringExtra("TITLE");
+        if (title != null) setTitle(title);
 
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         tasks = new ArrayList<>();
         adapter = new TaskAdapter(this, tasks, style, this::saveTasks);
-        rv.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
 
         loadTasks();
 
         ImageView add = findViewById(R.id.imagebutton6);
-        add.setOnClickListener(v -> showAddDialog());
+        if (add != null) {
+            add.setOnClickListener(v -> showAddDialog());
+        }
     }
 
     private int getLayoutByStyle(ListStyle style) {
@@ -74,133 +70,123 @@ public class checkboxscreen extends AppCompatActivity {
     }
 
     private void loadTasks() {
+        if (PREFKEY == null) {
+            tasks.clear();
+            adapter.notifyDataSetChanged();
+            return;
+        }
         db.collection("tasks")
-                .document(PREF_KEY)
+                .document(PREFKEY)
                 .get()
                 .addOnSuccessListener(doc -> {
-                    if (!doc.exists()) return;
-
-                    List<Map<String, Object>> list =
-                            (List<Map<String, Object>>) doc.get("tasks");
-
-                    if (list == null) return;
-
                     tasks.clear();
-
-                    for (Map<String, Object> m : list) {
-                        TaskItem t = new TaskItem();
-                        t.name = (String) m.get("name");
-                        t.checked = Boolean.TRUE.equals(m.get("checked"));
-                        t.startTime = m.get("startTime") == null ? 0 : (long) m.get("startTime");
-                        t.endTime = m.get("endTime") == null ? 0 : (long) m.get("endTime");
-                        tasks.add(t);
+                    if (doc.exists()) {
+                        List<?> arr = (List<?>) doc.get("items");
+                        if (arr != null) {
+                            for (Object o : arr) {
+                                if (o instanceof java.util.Map) {
+                                    java.util.Map<?, ?> m = (java.util.Map<?, ?>) o;
+                                    TaskItem t = new TaskItem();
+                                    t.id = m.get("id") != null ? m.get("id").toString() : null;
+                                    t.name = m.get("name") != null ? m.get("name").toString() : "";
+                                    Object c = m.get("checked");
+                                    t.checked = c instanceof Boolean && (Boolean) c;
+                                    Object st = m.get("startTime");
+                                    Object et = m.get("endTime");
+                                    t.startTime = st instanceof Number ? ((Number) st).longValue() : System.currentTimeMillis();
+                                    t.endTime = et instanceof Number ? ((Number) et).longValue() : 0L;
+                                    Object tc = m.get("textColor");
+                                    t.textColor = tc instanceof Number ? ((Number) tc).intValue() : 0xFF030320;
+                                    Object fs = m.get("fontStyle");
+                                    t.fontStyle = fs != null ? fs.toString() : "NORMAL";
+                                    tasks.add(t);
+                                }
+                            }
+                        }
                     }
-
                     adapter.notifyDataSetChanged();
+                    updateListDuration();
                 });
     }
 
-    private void showAddDialog() {
-        EditText input = new EditText(this);
-        input.setHint(style == ListStyle.MEMO ? "Max 50 words" : "Text");
-
-        new AlertDialog.Builder(this)
-                .setTitle("Add Item")
-                .setView(input)
-                .setPositiveButton("Add", (d, w) -> {
-                    String text = input.getText().toString().trim();
-
-                    if (style == ListStyle.MEMO && text.split("\\s+").length > 50) return;
-
-                    if (!TextUtils.isEmpty(text)) {
-                        tasks.add(new TaskItem(text));
-                        adapter.notifyItemInserted(tasks.size() - 1);
-                        saveTasks();
-                    }
-                })
-                .show();
-    }
-
     private void saveTasks() {
-        List<Map<String, Object>> save = new ArrayList<>();
-
+        List<java.util.Map<String, Object>> arr = new ArrayList<>();
         for (TaskItem t : tasks) {
-            Map<String, Object> m = new HashMap<>();
+            java.util.Map<String, Object> m = new java.util.HashMap<>();
+            m.put("id", t.id);
             m.put("name", t.name);
             m.put("checked", t.checked);
             m.put("startTime", t.startTime);
             m.put("endTime", t.endTime);
-            save.add(m);
+            m.put("textColor", t.textColor);
+            m.put("fontStyle", t.fontStyle);
+            arr.add(m);
         }
-
+        java.util.Map<String, Object> root = new java.util.HashMap<>();
+        root.put("items", arr);
         db.collection("tasks")
-                .document(PREF_KEY)
-                .set(Collections.singletonMap("tasks", save));
+                .document(PREFKEY)
+                .set(root);
 
-        updateListAndCategoryDurations();
+        updateListDuration();
     }
 
-    private void updateListAndCategoryDurations() {
-        db.collection("users")
-                .document("demoUser")
-                .get()
-                .addOnSuccessListener(doc -> {
-                    if (!doc.exists()) return;
-
-                    List<?> catList = (List<?>) doc.get("categories");
-                    if (catList == null) return;
-
-                    boolean changed = false;
-                    List<Map<String, Object>> cats = new java.util.ArrayList<>();
-
-                    for (Object cObj : catList) {
-                        Map<String, Object> c = (Map<String, Object>) cObj;
-                        List<?> listList = (List<?>) c.get("lists");
-                        long catTotal = 0;
-
-                        if (listList != null) {
-                            java.util.List<Map<String, Object>> newLists = new java.util.ArrayList<>();
-                            for (Object lObj : listList) {
-                                Map<String, Object> l = (Map<String, Object>) lObj;
-                                String id = (String) l.get("id");
-
-                                if (id != null && id.equals(listId)) {
-                                    long listTotal = 0;
-                                    long now = System.currentTimeMillis();
-                                    for (TaskItem t : tasks) {
-                                        if (t.startTime == 0) continue;
-                                        if (t.checked && t.endTime > 0) {
-                                            listTotal += (t.endTime - t.startTime);
-                                        } else {
-                                            listTotal += (now - t.startTime);
-                                        }
-                                    }
-                                    l.put("totalDurationMs", Long.valueOf(listTotal));
-                                    changed = true;
-                                }
-
-                                Object dObj = l.get("totalDurationMs");
-                                if (dObj instanceof Number) {
-                                    catTotal += ((Number) dObj).longValue();
-                                }
-
-                                newLists.add(l);
-                            }
-                            c.put("lists", newLists);
-                        }
-
-                        c.put("totalDurationMs", Long.valueOf(catTotal));
-                        cats.add(c);
+    private void showAddDialog() {
+        android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint("Task name");
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("New Task")
+                .setView(input)
+                .setPositiveButton("Add", (d, w) -> {
+                    String name = input.getText().toString().trim();
+                    if (!name.isEmpty()) {
+                        TaskItem t = new TaskItem(name);
+                        tasks.add(t);
+                        adapter.notifyItemInserted(tasks.size() - 1);
+                        saveTasks();
                     }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+    private void updateListDuration() {
+        long total = 0;
+        long now = System.currentTimeMillis();
+        for (TaskItem t : tasks) {
+            long end = t.endTime > 0 ? t.endTime : now;
+            long dur = end - t.startTime;
+            if (dur > 0) total += dur;
+        }
 
-                    if (changed) {
-                        Map<String, Object> data = new HashMap<>();
-                        data.put("categories", cats);
-                        db.collection("users")
-                                .document("demoUser")
-                                .set(data);
+        final long totalFinal = total;
+        android.util.Log.d("checkboxscreen", "Computed list duration=" + totalFinal + "ms for listId=" + listId);
+
+        CategoryRepository.get(this).loadCategories(list -> {
+            if (list == null) {
+                android.util.Log.d("checkboxscreen", "No categories loaded");
+                return;
+            }
+            boolean changed = false;
+            for (CategoryItem c : list) {
+                if (c.lists == null) continue;
+                for (ListItem li : c.lists) {
+                    android.util.Log.d("checkboxscreen", "Checking li.id=" + li.id);
+                    if (li.id != null && li.id.equals(listId)) {
+                        android.util.Log.d("checkboxscreen", "MATCH, updating li.totalDurationMs");
+                        li.totalDurationMs = totalFinal;
+                        c.recalcDuration();
+                        changed = true;
+                        break;
                     }
-                });
+                }
+            }
+            if (changed) {
+                CategoryRepository.get(this).saveCategories(list);
+                android.util.Log.d("checkboxscreen", "Saved categories with updated duration");
+            } else {
+                android.util.Log.d("checkboxscreen", "No matching list found for listId=" + listId);
+            }
+        });
     }
 
 

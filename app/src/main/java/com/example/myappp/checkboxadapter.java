@@ -36,7 +36,8 @@ public class checkboxadapter extends RecyclerView.Adapter<checkboxadapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_checkbox, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_checkbox, parent, false);
         return new ViewHolder(view);
     }
 
@@ -47,11 +48,17 @@ public class checkboxadapter extends RecyclerView.Adapter<checkboxadapter.ViewHo
         holder.checkbox.setChecked(task.checked);
 
         holder.checkbox.setOnCheckedChangeListener((b, isChecked) -> {
+            long now = System.currentTimeMillis();
             task.checked = isChecked;
-            if (isChecked) task.endTime = System.currentTimeMillis();
-            else task.endTime = 0L;
+            if (isChecked) {
+                if (task.startTime == 0L) task.startTime = now;
+                task.endTime = now;
+            } else {
+                task.endTime = now;
+            }
             saveCallback.run();
         });
+
 
         holder.checkbox.setOnClickListener(v -> {
             long clickTime = System.currentTimeMillis();
@@ -81,10 +88,13 @@ public class checkboxadapter extends RecyclerView.Adapter<checkboxadapter.ViewHo
                     saveCallback.run();
                 })
                 .setNeutralButton("Show Duration", (d, w) -> {
-                    long duration = task.endTime > 0 ? task.endTime - task.startTime : System.currentTimeMillis() - task.startTime;
+                    long now = System.currentTimeMillis();
+                    long end = task.endTime > 0 ? task.endTime : now;
+                    long duration = end - task.startTime;
+                    if (duration < 0) duration = 0;
                     new AlertDialog.Builder(context)
                             .setTitle("Task Duration")
-                            .setMessage("Duration: " + (duration/1000) + " seconds")
+                            .setMessage("Duration: " + (duration / 1000) + " seconds")
                             .setPositiveButton("OK", null)
                             .show();
                 })

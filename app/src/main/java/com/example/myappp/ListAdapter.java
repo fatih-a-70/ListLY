@@ -30,9 +30,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             R.drawable.p8, R.drawable.p9, R.drawable.g0, R.drawable.g9
     };
 
-    public ListAdapter(Context context,
-                       List<ListItem> lists,
-                       List<CategoryItem> allCategories) {
+    public ListAdapter(Context context, List<ListItem> lists, List<CategoryItem> allCategories) {
         this.context = context;
         this.lists = lists;
         this.allCategories = allCategories;
@@ -52,17 +50,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(
-                LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.item_list, parent, false)
-        );
+    public ListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_list, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder h, int position) {
+    public void onBindViewHolder(@NonNull ListAdapter.ViewHolder h, int position) {
         ListItem item = lists.get(position);
-
         h.tvListTitle.setText(item.title);
         h.tvListTitle.setTextColor(item.textColor);
         h.tvListTitle.setTextSize(item.fontSizeSp);
@@ -76,54 +71,66 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
         h.previewContainer.setBackgroundResource(item.themeRes);
         h.previewContainer.removeAllViews();
-
         View preview = LayoutInflater.from(context)
                 .inflate(item.previewLayout, h.previewContainer, false);
         h.previewContainer.addView(preview);
 
-        h.tvListTitle.setOnClickListener(v -> {
-            long now = System.currentTimeMillis();
-            if (now - h.lastClick < 300) showOptions(item, position);
-            h.lastClick = now;
-        });
-
         h.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, checkboxscreen.class);
             intent.putExtra("STYLE", item.style.name());
-            intent.putExtra("PREF_KEY", item.prefKey);
+            intent.putExtra("PREFKEY", item.prefKey);
             intent.putExtra("TITLE", item.title);
             intent.putExtra("THEME", item.themeRes);
             intent.putExtra("LIST_ID", item.id);
             context.startActivity(intent);
         });
+
+        h.tvListTitle.setOnClickListener(v -> {
+            long now = System.currentTimeMillis();
+            if (now - h.lastClick < 300) {
+                showOptions(item, position);
+            }
+            h.lastClick = now;
+        });
     }
 
     private void showOptions(ListItem item, int pos) {
-        String[] options = {"Edit Name", "Change Theme", "Text Color", "Font Style/Size", "Delete", "Duration"};
-
+        String[] options = {
+                "Edit Name", "Change Theme",
+                "Text Color", "Font Style/Size",
+                "Delete", "Duration"
+        };
         new AlertDialog.Builder(context)
                 .setTitle("List Options")
                 .setItems(options, (d, i) -> {
                     if (i == 0) editName(item, pos);
-                    if (i == 1) pickTheme(item, pos);
-                    if (i == 2) pickTextColor(item, pos);
-                    if (i == 3) pickFont(item, pos);
-                    if (i == 4) deleteList(pos);
-                    if (i == 5) showListDuration(item);
+                    else if (i == 1) pickTheme(item, pos);
+                    else if (i == 2) pickTextColor(item, pos);
+                    else if (i == 3) pickFont(item, pos);
+                    else if (i == 4) deleteList(pos);
+                    else if (i == 5) showListDuration(item);
                 })
                 .show();
     }
 
     private void showListDuration(ListItem item) {
-        long duration = item.totalDurationMs;
-        String created = DateFormat.getDateTimeInstance().format(new Date(item.createdAt));
+        long createdAt = item.createdAt != 0 ? item.createdAt : System.currentTimeMillis();
+        long now = System.currentTimeMillis();
+        long duration = now - createdAt;
+
+        String created = DateFormat.getDateTimeInstance()
+                .format(new Date(createdAt));
         String msg = "Created: " + created + "\nDuration: " + formatDuration(duration);
+
+
         new AlertDialog.Builder(context)
                 .setTitle("List Info")
                 .setMessage(msg)
                 .setPositiveButton("OK", null)
                 .show();
     }
+
+
 
     private String formatDuration(long ms) {
         long seconds = ms / 1000;
@@ -135,10 +142,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         return String.format("%02d:%02d", minutes, seconds);
     }
 
+
     private void editName(ListItem item, int pos) {
         EditText input = new EditText(context);
         input.setText(item.title);
-
         new AlertDialog.Builder(context)
                 .setTitle("Edit List Name")
                 .setView(input)
@@ -151,13 +158,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                         saveAll();
                     }
                 })
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 
     private void pickTheme(ListItem item, int pos) {
         String[] names = new String[THEMES.length];
-        for (int i = 0; i < names.length; i++) names[i] = "Theme " + i;
-
+        for (int i = 0; i < names.length; i++) {
+            names[i] = "Theme " + (i + 1);
+        }
         new AlertDialog.Builder(context)
                 .setTitle("Select Theme")
                 .setItems(names, (d, i) -> {
@@ -177,7 +186,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                 0xFF0000FF,
                 0xFF008000
         };
-
         new AlertDialog.Builder(context)
                 .setTitle("Select Text Color")
                 .setItems(options, (d, i) -> {
@@ -191,7 +199,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     private void pickFont(ListItem item, int pos) {
         String[] styles = {"Normal", "Bold", "Italic"};
-
         new AlertDialog.Builder(context)
                 .setTitle("Font Style")
                 .setItems(styles, (d, styleIndex) -> {
@@ -201,13 +208,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                     else style = "NORMAL";
 
                     EditText sizeInput = new EditText(context);
-                    sizeInput.setHint("Font size sp");
+                    sizeInput.setHint("Font size (sp)");
                     sizeInput.setText(String.valueOf(item.fontSizeSp));
 
                     new AlertDialog.Builder(context)
                             .setTitle("Font Size")
                             .setView(sizeInput)
-                            .setPositiveButton("OK", (d2, w) -> {
+                            .setPositiveButton("OK", (d2, w2) -> {
                                 float sz;
                                 try {
                                     sz = Float.parseFloat(sizeInput.getText().toString().trim());
@@ -240,4 +247,5 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public int getItemCount() {
         return lists.size();
     }
+
 }

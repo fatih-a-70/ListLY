@@ -2,6 +2,7 @@ package com.example.myappp;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +12,9 @@ import android.widget.EditText;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
-
     Context context;
     List<TaskItem> items;
     ListStyle style;
@@ -35,6 +33,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
     static class VH extends RecyclerView.ViewHolder {
         CheckBox cb;
         long lastClickTime = 0;
+
         VH(View v) {
             super(v);
             cb = v.findViewById(R.id.itemcheckbox);
@@ -51,13 +50,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
     @Override
     public void onBindViewHolder(VH h, int position) {
         TaskItem item = items.get(position);
-
         h.cb.setOnCheckedChangeListener(null);
         h.cb.setChecked(false);
         h.cb.setButtonDrawable(null);
 
         switch (style) {
-
             case CHECKBOX:
                 h.cb.setButtonDrawable(
                         ContextCompat.getDrawable(
@@ -65,16 +62,31 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
                                 android.R.drawable.checkbox_on_background
                         )
                 );
-
                 h.cb.setText(item.name);
                 h.cb.setChecked(item.checked);
 
+                // Apply saved text color and font style
+                h.cb.setTextColor(item.textColor);
+                if ("BOLD".equals(item.fontStyle)) {
+                    h.cb.setTypeface(Typeface.DEFAULT_BOLD);
+                } else if ("ITALIC".equals(item.fontStyle)) {
+                    h.cb.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
+                } else {
+                    h.cb.setTypeface(Typeface.DEFAULT);
+                }
+                // If you later add size field to TaskItem (e.g. float fontSizeSp), also do:
+                // h.cb.setTextSize(item.fontSizeSp);
+
                 h.cb.setOnCheckedChangeListener((b, isChecked) -> {
+                    long now = System.currentTimeMillis();
                     item.checked = isChecked;
                     if (isChecked) {
-                        item.endTime = System.currentTimeMillis();
+                        if (item.startTime == 0L) {
+                            item.startTime = now;
+                        }
+                        item.endTime = now;
                     } else {
-                        item.endTime = 0;
+                        item.endTime = now;
                     }
                     saveCallback.run();
                 });
@@ -84,11 +96,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
                     if (now - h.lastClickTime < 300) showTaskOptions(item, position);
                     h.lastClickTime = now;
                 });
-
                 break;
 
             case WISHLIST:
-                h.cb.setText("❤️ " + item.name);
+                h.cb.setText(" ✨ " + item.name);
                 h.cb.setOnClickListener(v -> {
                     long now = System.currentTimeMillis();
                     if (now - h.lastClickTime < 300) showSimpleTaskOptions(position);
@@ -126,14 +137,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
     }
 
     private void showTaskOptions(TaskItem item, int pos) {
-        String[] options = {"Edit Task", "Delete Task", "Task Duration"};
-
+        String[] options = {"Edit Task", "Delete Task", "Task Duration", "Text Color", "Font Style"};
         new AlertDialog.Builder(context)
                 .setTitle("Task Options")
                 .setItems(options, (d, i) -> {
                     if (i == 0) editTask(item, pos);
                     if (i == 1) deleteTask(pos);
                     if (i == 2) showTaskDuration(item);
+                    if (i == 3) pickTextColor(item, pos);
+                    if (i == 4) pickFontStyle(item, pos);
                 })
                 .show();
     }
@@ -142,7 +154,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
         TaskItem item = items.get(pos);
         EditText input = new EditText(context);
         input.setText(item.name);
-
         new AlertDialog.Builder(context)
                 .setTitle("Edit or Delete")
                 .setView(input)
@@ -162,12 +173,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
     private void editTask(TaskItem item, int pos) {
         EditText input = new EditText(context);
         input.setText(item.name);
-
         new AlertDialog.Builder(context)
                 .setTitle("Edit Task")
                 .setView(input)
-                .setPositiveButton("Update", (d, w) -> {
-                    item.name = input.getText().toString();
+                .setPositiveButton("Save", (d, w) -> {
+                    item.name = input.getText().toString().trim();
                     notifyItemChanged(pos);
                     saveCallback.run();
                 })
@@ -182,33 +192,48 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
     }
 
     private void showTaskDuration(TaskItem item) {
-        String status = item.checked ? "completed" : "not completed";
-        String created = DateFormat.getDateTimeInstance().format(new Date(item.startTime));
-        long durationMs;
-        if (item.checked && item.endTime > 0) {
-            durationMs = item.endTime - item.startTime;
-        } else {
-            durationMs = System.currentTimeMillis() - item.startTime;
-        }
-        String msg = "Task status: " + status +
-                "\nTask created time: " + created +
-                "\nTask duration: " + formatDuration(durationMs);
-
+        long now = System.currentTimeMillis();
+        long end = item.endTime > 0 ? item.endTime : now;
+        long dur = end - item.startTime;
+        if (dur < 0) dur = 0;
+        String msg = "Duration: " + (dur / 1000) + " seconds";
         new AlertDialog.Builder(context)
-                .setTitle("Task Info")
+                .setTitle("Task Duration")
                 .setMessage(msg)
                 .setPositiveButton("OK", null)
                 .show();
     }
 
-    private String formatDuration(long ms) {
-        long seconds = ms / 1000;
-        long minutes = seconds / 60;
-        long hours = minutes / 60;
-        seconds %= 60;
-        minutes %= 60;
-        if (hours > 0) return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-        return String.format("%02d:%02d", minutes, seconds);
+    private void pickTextColor(TaskItem item, int pos) {
+        String[] options = {"White", "Red", "Blue", "Black"};
+        int[] colors = {
+                0xFFFFFFFF,
+                0xFFFF0000,
+                0xFF0000FF,
+                0x00000000
+        };
+        new AlertDialog.Builder(context)
+                .setTitle("Select Text Color")
+                .setItems(options, (d, i) -> {
+                    item.textColor = colors[i];
+                    notifyItemChanged(pos);
+                    saveCallback.run();
+                })
+                .show();
+    }
+
+    private void pickFontStyle(TaskItem item, int pos) {
+        String[] styles = {"Normal", "Bold", "Italic"};
+        new AlertDialog.Builder(context)
+                .setTitle("Font Style")
+                .setItems(styles, (d, i) -> {
+                    if (i == 1) item.fontStyle = "BOLD";
+                    else if (i == 2) item.fontStyle = "ITALIC";
+                    else item.fontStyle = "NORMAL";
+                    notifyItemChanged(pos);
+                    saveCallback.run();
+                })
+                .show();
     }
 
     @Override

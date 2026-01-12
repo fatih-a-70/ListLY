@@ -1,35 +1,39 @@
 package com.example.myappp;
 
-import com.google.firebase.firestore.Exclude;
-import com.google.firebase.firestore.IgnoreExtraProperties;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@IgnoreExtraProperties
-public class CategoryItem {
 
-    public String id;
-    public String name;
-    public List<ListItem> lists = new ArrayList<>();
-    public long createdAt;
-    public long updatedAt;
-    public long totalDurationMs;
+    public class CategoryItem {
+        public String id;
+        public String name;
+        public List<ListItem> lists = new ArrayList<>();
 
-    public CategoryItem() {
-    }
+        public long createdAt;
+        public long updatedAt;
 
-    public CategoryItem(String id, String name) {
-        this.id = id;
-        this.name = name;
-        long now = System.currentTimeMillis();
-        this.createdAt = now;
-        this.updatedAt = now;
-        this.totalDurationMs = 0;
-    }
+        public long totalDurationMs;
 
-    @Exclude
-    public boolean isEmpty() {
-        return name == null || name.isEmpty();
-    }
-}
+        public CategoryItem() {
+            // needed for manual creation / Firestore
+        }
+
+        public CategoryItem(String id, String name) {
+            this.id = id;
+            this.name = name;
+            this.createdAt = System.currentTimeMillis();
+            this.updatedAt = this.createdAt;
+            this.totalDurationMs = 0;
+        }
+
+        public void recalcDuration() {
+            long sum = 0;
+            if (lists != null) {
+                for (ListItem li : lists) {
+                    sum += li.totalDurationMs;
+                }
+            }
+            totalDurationMs = sum;
+        }}
+
+

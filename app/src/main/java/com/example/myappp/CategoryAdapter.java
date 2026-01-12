@@ -4,8 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;      // add this
-
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -53,7 +52,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CategoryAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(
                 LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.homebox, parent, false)
@@ -61,25 +60,39 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CategoryAdapter.ViewHolder holder, int position) {
         CategoryItem category = categories.get(position);
+
         holder.tvCategory.setText(category.name);
 
         holder.tvCategory.setOnClickListener(v -> {
             long now = System.currentTimeMillis();
-            if (now - holder.lastClick < 300) {
-                showCategoryOptions(category, position);
-            }
+            if (now - holder.lastClick < 300) return;
+            showCategoryOptions(category, position);
             holder.lastClick = now;
         });
 
+        // OUTER child recycler for this category: VERTICAL
         holder.rvRows.setLayoutManager(
-                new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+                new LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         );
         holder.rvRows.setNestedScrollingEnabled(false);
-        holder.rvRows.setAdapter(
-                new ListAdapter(context, category.lists, categories)
-        );
+
+        // Single RowItem containing all lists in this category
+        RowItem rowItem = new RowItem();
+        rowItem.lists = category.lists;
+
+        java.util.List<RowItem> rowList = new java.util.ArrayList<>();
+        rowList.add(rowItem);
+
+        RowAdapter rowAdapter = new RowAdapter(context, rowList, categories);
+        rowAdapter.setSortMode(sortMode);
+        holder.rvRows.setAdapter(rowAdapter);
+    }
+
+    @Override
+    public int getItemCount() {
+        return categories.size();
     }
 
     private void showCategoryOptions(CategoryItem cat, int pos) {
@@ -96,8 +109,16 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     }
 
     private void showCategoryDuration(CategoryItem cat) {
-        String created = DateFormat.getDateTimeInstance().format(new Date(cat.createdAt));
-        String msg = "Created: " + created + "\nDuration: " + formatDuration(cat.totalDurationMs);
+        long createdAt = cat.createdAt != 0 ? cat.createdAt : System.currentTimeMillis();
+        long now = System.currentTimeMillis();
+        long duration = now - createdAt;
+
+        android.util.Log.d("CategoryAdapter", "totalDurationMs=" + cat.totalDurationMs);
+
+        String created = DateFormat.getDateTimeInstance().format(new Date(createdAt));
+        String msg = "Created: " + created + "\n" +
+                "Elapsed: " + formatDuration(duration);
+
         new AlertDialog.Builder(context)
                 .setTitle("Category Info")
                 .setMessage(msg)
@@ -109,9 +130,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         long seconds = ms / 1000;
         long minutes = seconds / 60;
         long hours = minutes / 60;
-        seconds %= 60;
-        minutes %= 60;
-        if (hours > 0) return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        seconds = seconds % 60;
+        minutes = minutes % 60;
+        if (hours > 0) {
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        }
         return String.format("%02d:%02d", minutes, seconds);
     }
 
@@ -148,10 +171,5 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
-    }
-
-    @Override
-    public int getItemCount() {
-        return categories.size();
     }
 }
