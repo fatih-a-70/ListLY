@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ListSorter {
-
     public static void sortListsAlphabetical(List<ListItem> lists) {
         Collections.sort(lists, Comparator.comparing(l -> l.title.toLowerCase()));
     }

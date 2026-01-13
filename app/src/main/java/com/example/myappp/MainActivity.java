@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_USERNAME = "username";
 
     private final int[] THEMES = new int[]{
-            R.drawable.p10, R.drawable.p1, R.drawable.p2, R.drawable.p3,
+            R.drawable.p0, R.drawable.p1, R.drawable.p2, R.drawable.p3,
             R.drawable.p4, R.drawable.p5, R.drawable.p6, R.drawable.p7,
             R.drawable.p8, R.drawable.p9, R.drawable.g0, R.drawable.g9
     };
@@ -123,14 +123,12 @@ public class MainActivity extends AppCompatActivity {
         input.setHint("Enter user name");
         String current = prefs.getString(KEY_USERNAME, "");
         input.setText(current);
-
         new AlertDialog.Builder(this)
                 .setTitle("Set User Name")
                 .setView(input)
                 .setPositiveButton("Save", (dialog, which) -> {
                     String name = input.getText().toString().trim();
                     prefs.edit().putString(KEY_USERNAME, name).apply();
-                    // you can also include the name in a separate toast if you like
                 })
                 .setNegativeButton("Cancel", null)
                 .show();

@@ -59,7 +59,6 @@ public class checkboxadapter extends RecyclerView.Adapter<checkboxadapter.ViewHo
             saveCallback.run();
         });
 
-
         holder.checkbox.setOnClickListener(v -> {
             long clickTime = System.currentTimeMillis();
             if (clickTime - holder.lastClickTime < 300) {

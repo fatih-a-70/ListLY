@@ -40,17 +40,16 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.ViewHolder> {
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RowAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_row, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RowAdapter.ViewHolder holder, int position) {
         RowItem row = rows.get(position);
         List<ListItem> lists = row.lists;
-
         if (lists == null) {
             lists = new java.util.ArrayList<>();
         }
@@ -65,8 +64,7 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.ViewHolder> {
             ListSorter.sortListsByStyle(lists);
         }
 
-        LinearLayoutManager lm =
-                new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false);
+        LinearLayoutManager lm = new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false);
         holder.rvHorizontalLists.setLayoutManager(lm);
         holder.rvHorizontalLists.setNestedScrollingEnabled(false);
         holder.rvHorizontalLists.setHasFixedSize(false);

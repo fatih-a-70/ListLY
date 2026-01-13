@@ -8,7 +8,6 @@ public class TaskItem {
     public boolean checked;
     public long startTime;
     public long endTime;
-
     public int textColor;
     public String fontStyle;
 

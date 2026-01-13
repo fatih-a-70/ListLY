@@ -64,7 +64,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         CategoryItem category = categories.get(position);
 
         holder.tvCategory.setText(category.name);
-
         holder.tvCategory.setOnClickListener(v -> {
             long now = System.currentTimeMillis();
             if (now - holder.lastClick < 300) return;
@@ -72,16 +71,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             holder.lastClick = now;
         });
 
-        // OUTER child recycler for this category: VERTICAL
         holder.rvRows.setLayoutManager(
                 new LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         );
         holder.rvRows.setNestedScrollingEnabled(false);
 
-        // Single RowItem containing all lists in this category
         RowItem rowItem = new RowItem();
         rowItem.lists = category.lists;
-
         java.util.List<RowItem> rowList = new java.util.ArrayList<>();
         rowList.add(rowItem);
 
@@ -97,7 +93,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     private void showCategoryOptions(CategoryItem cat, int pos) {
         String[] options = {"Edit Category Name", "Delete Category", "Duration"};
-
         new AlertDialog.Builder(context)
                 .setTitle("Category Options")
                 .setItems(options, (d, w) -> {
@@ -141,7 +136,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     private void editCategory(CategoryItem cat, int pos) {
         EditText input = new EditText(context);
         input.setText(cat.name);
-
         new AlertDialog.Builder(context)
                 .setTitle("Edit Category")
                 .setView(input)

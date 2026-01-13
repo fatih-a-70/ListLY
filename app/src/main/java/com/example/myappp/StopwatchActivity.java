@@ -23,10 +23,8 @@ public class StopwatchActivity extends AppCompatActivity {
     private Button startBtn;
     private Button stopBtn;
     private Button resetBtn;
-
     private Button focusModeBtn;
     private Button historyBtn;
-
     private Button tenMinBtn;
     private Button thirtyMinBtn;
     private Button oneHourBtn;
@@ -103,16 +101,13 @@ public class StopwatchActivity extends AppCompatActivity {
         startBtn = findViewById(R.id.startBtn);
         stopBtn = findViewById(R.id.stopBtn);
         resetBtn = findViewById(R.id.resetBtn);
-
         focusModeBtn = findViewById(R.id.startBtn14);
         historyBtn = findViewById(R.id.startBtn9);
-
         tenMinBtn = findViewById(R.id.startBtn2);
         thirtyMinBtn = findViewById(R.id.startBtn4);
         oneHourBtn = findViewById(R.id.startBtn6);
         threeHourBtn = findViewById(R.id.startBtn5);
         customBtn = findViewById(R.id.startBtn3);
-
         modeLabel = findViewById(R.id.textView14);
 
         timeText.setText("00:00:00");
@@ -142,7 +137,6 @@ public class StopwatchActivity extends AppCompatActivity {
         });
 
         focusModeBtn.setOnClickListener(v -> showModeDialog());
-
         historyBtn.setOnClickListener(v -> showHistoryDialog());
 
         tenMinBtn.setOnClickListener(v -> applyPresetMinutes(getPresetFromButton(tenMinBtn, 10)));
@@ -197,7 +191,6 @@ public class StopwatchActivity extends AppCompatActivity {
     private void stopRunning(boolean autoFinished) {
         running = false;
         handler.removeCallbacks(runnable);
-
         long end = System.currentTimeMillis();
         long done = end - sessionStartMs;
 
@@ -206,7 +199,6 @@ public class StopwatchActivity extends AppCompatActivity {
         session.durationPlanned = presetMs;
         session.durationDone = done;
         session.dateMs = end;
-
         sessions.add(0, session);
     }
 
@@ -232,7 +224,6 @@ public class StopwatchActivity extends AppCompatActivity {
     private void applyPresetMinutes(int minutes) {
         long ms = minutes * 60L * 1000L;
         presetMs = ms;
-
         if (mode == FocusMode.COUNTDOWN_FORWARD) {
             displayMs = 0;
         } else if (mode == FocusMode.COUNTDOWN_BACKWARD) {
@@ -311,7 +302,6 @@ public class StopwatchActivity extends AppCompatActivity {
                     .show();
             return;
         }
-
         StringBuilder sb = new StringBuilder();
         int i = sessions.size();
         for (FocusSession s : sessions) {
@@ -323,20 +313,15 @@ public class StopwatchActivity extends AppCompatActivity {
             } else {
                 modeStr = "stopwatch";
             }
-
             String dateStr = DateFormat.getDateInstance().format(new Date(s.dateMs));
             String timeStr = DateFormat.getTimeInstance().format(new Date(s.dateMs));
-
             sb.append("Focus session ").append(i).append("\n");
-
             long durationToShow = (s.mode == FocusMode.STOPWATCH)
                     ? s.durationDone
                     : (s.durationPlanned > 0 ? s.durationPlanned : s.durationDone);
-
             sb.append("Duration : ").append(formatTime(durationToShow)).append("\n");
             sb.append("Date : ").append(dateStr).append("\n");
             sb.append("Time : ").append(timeStr).append("\n");
-
             String status;
             if (s.mode == FocusMode.STOPWATCH) {
                 status = "completed(" + formatTime(s.durationDone) + ")";
@@ -349,13 +334,10 @@ public class StopwatchActivity extends AppCompatActivity {
             } else {
                 status = "completed(" + formatTime(s.durationDone) + ")";
             }
-
             sb.append("Status : ").append(status).append("\n");
-
             sb.append("Focus mode : ").append(modeStr).append("\n\n");
             i--;
         }
-
         new AlertDialog.Builder(this)
                 .setTitle("Focus Sessions History")
                 .setMessage(sb.toString())

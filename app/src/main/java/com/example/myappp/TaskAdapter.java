@@ -65,7 +65,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
                 h.cb.setText(item.name);
                 h.cb.setChecked(item.checked);
 
-                // Apply saved text color and font style
                 h.cb.setTextColor(item.textColor);
                 if ("BOLD".equals(item.fontStyle)) {
                     h.cb.setTypeface(Typeface.DEFAULT_BOLD);
@@ -74,8 +73,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.VH> {
                 } else {
                     h.cb.setTypeface(Typeface.DEFAULT);
                 }
-                // If you later add size field to TaskItem (e.g. float fontSizeSp), also do:
-                // h.cb.setTextSize(item.fontSizeSp);
 
                 h.cb.setOnCheckedChangeListener((b, isChecked) -> {
                     long now = System.currentTimeMillis();

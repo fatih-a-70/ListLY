@@ -149,6 +149,7 @@ public class checkboxscreen extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
     private void updateListDuration() {
         long total = 0;
         long now = System.currentTimeMillis();
@@ -157,7 +158,6 @@ public class checkboxscreen extends AppCompatActivity {
             long dur = end - t.startTime;
             if (dur > 0) total += dur;
         }
-
         final long totalFinal = total;
         android.util.Log.d("checkboxscreen", "Computed list duration=" + totalFinal + "ms for listId=" + listId);
 
@@ -188,6 +188,4 @@ public class checkboxscreen extends AppCompatActivity {
             }
         });
     }
-
-
 }

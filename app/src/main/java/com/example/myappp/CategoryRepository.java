@@ -54,11 +54,10 @@ public class CategoryRepository {
                             listener.onLoaded(null);
                             return;
                         }
-
                         List<CategoryItem> result = new java.util.ArrayList<>();
                         for (Object obj : raw) {
                             if (!(obj instanceof java.util.Map)) continue;
-                            java.util.Map<?,?> cm = (java.util.Map<?,?>) obj;
+                            java.util.Map<?, ?> cm = (java.util.Map<?, ?>) obj;
 
                             CategoryItem cat = new CategoryItem();
                             cat.id = cm.get("id") != null ? cm.get("id").toString() : null;
@@ -73,17 +72,20 @@ public class CategoryRepository {
                             if (listsObj instanceof java.util.List) {
                                 for (Object lo : (java.util.List<?>) listsObj) {
                                     if (!(lo instanceof java.util.Map)) continue;
-                                    java.util.Map<?,?> lm = (java.util.Map<?,?>) lo;
+                                    java.util.Map<?, ?> lm = (java.util.Map<?, ?>) lo;
+
                                     ListItem li = new ListItem();
                                     li.id = lm.get("id") != null ? lm.get("id").toString() : null;
                                     li.title = lm.get("title") != null ? lm.get("title").toString() : "";
                                     li.prefKey = lm.get("prefKey") != null ? lm.get("prefKey").toString() : null;
+
                                     Object cr = lm.get("createdAt");
                                     li.createdAt = cr instanceof Number ? ((Number) cr).longValue() : 0L;
                                     Object up = lm.get("updatedAt");
                                     li.updatedAt = up instanceof Number ? ((Number) up).longValue() : 0L;
                                     Object td = lm.get("totalDurationMs");
                                     li.totalDurationMs = td instanceof Number ? ((Number) td).longValue() : 0L;
+
                                     Object theme = lm.get("themeRes");
                                     li.themeRes = theme instanceof Number ? ((Number) theme).intValue() : R.drawable.p5;
                                     Object color = lm.get("textColor");
@@ -94,8 +96,11 @@ public class CategoryRepository {
                                     li.fontStyle = ff != null ? ff.toString() : "NORMAL";
                                     Object style = lm.get("style");
                                     if (style != null) {
-                                        try { li.style = ListStyle.valueOf(style.toString()); }
-                                        catch (Exception ignored) { li.style = ListStyle.CHECKBOX; }
+                                        try {
+                                            li.style = ListStyle.valueOf(style.toString());
+                                        } catch (Exception ignored) {
+                                            li.style = ListStyle.CHECKBOX;
+                                        }
                                     } else {
                                         li.style = ListStyle.CHECKBOX;
                                     }
@@ -105,7 +110,6 @@ public class CategoryRepository {
                                     cat.lists.add(li);
                                 }
                             }
-
                             result.add(cat);
                         }
                         listener.onLoaded(result);
@@ -118,5 +122,4 @@ public class CategoryRepository {
                     listener.onLoaded(null);
                 });
     }
-
 }

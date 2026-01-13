@@ -13,11 +13,8 @@ public class ListItem {
     public int textColor;
     public float fontSizeSp;
     public String fontStyle;
-
     public long createdAt;
     public long updatedAt;
-
     public long totalDurationMs;
-
     public List<TaskItem> tasks = new ArrayList<>();
 }

@@ -25,7 +25,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     private final List<CategoryItem> allCategories;
 
     int[] THEMES = {
-            R.drawable.p10, R.drawable.p1, R.drawable.p2, R.drawable.p3,
+            R.drawable.p0, R.drawable.p1, R.drawable.p2, R.drawable.p3,
             R.drawable.p4, R.drawable.p5, R.drawable.p6, R.drawable.p7,
             R.drawable.p8, R.drawable.p9, R.drawable.g0, R.drawable.g9
     };
@@ -58,9 +58,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ListAdapter.ViewHolder h, int position) {
         ListItem item = lists.get(position);
+
         h.tvListTitle.setText(item.title);
         h.tvListTitle.setTextColor(item.textColor);
         h.tvListTitle.setTextSize(item.fontSizeSp);
+
         if ("BOLD".equals(item.fontStyle)) {
             h.tvListTitle.setTypeface(Typeface.DEFAULT_BOLD);
         } else if ("ITALIC".equals(item.fontStyle)) {
@@ -122,15 +124,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                 .format(new Date(createdAt));
         String msg = "Created: " + created + "\nDuration: " + formatDuration(duration);
 
-
         new AlertDialog.Builder(context)
                 .setTitle("List Info")
                 .setMessage(msg)
                 .setPositiveButton("OK", null)
                 .show();
     }
-
-
 
     private String formatDuration(long ms) {
         long seconds = ms / 1000;
@@ -141,7 +140,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         if (hours > 0) return String.format("%02d:%02d:%02d", hours, minutes, seconds);
         return String.format("%02d:%02d", minutes, seconds);
     }
-
 
     private void editName(ListItem item, int pos) {
         EditText input = new EditText(context);
@@ -247,5 +245,4 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public int getItemCount() {
         return lists.size();
     }
-
 }
