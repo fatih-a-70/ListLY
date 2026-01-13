@@ -135,7 +135,6 @@
         android:layout_width="160dp"
         android:layout_height="64dp"
         android:backgroundTint="#0C1348"
-
         android:text="Focus Sessions History"
         android:textColor="#FFFFFF"
         android:textSize="13sp"
@@ -233,5 +232,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.796"
         app:srcCompat="@drawable/wall9" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

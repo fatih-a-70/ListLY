@@ -5,7 +5,6 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_marginStart="4dp"
-
         android:id="@+id/rvHorizontalLists"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
